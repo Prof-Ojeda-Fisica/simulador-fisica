@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Laboratório de Gravidade - V3</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; background: #1a1a2e; color: #fff; margin: 0; padding: 20px; }
+        canvas { background: #000; border: 2px solid #444; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .painel { background: #16213e; padding: 20px; border-radius: 10px; width: 760px; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border: 1px solid #0f3460; }
+        .info { grid-column: span 2; background: #0f3460; padding: 12px; border-radius: 5px; text-align: center; font-size: 1.1em; border-left: 5px solid #e94560; font-family: monospace; }
+        .velocimetro { color: #f1c40f; font-weight: bold; font-size: 1.2em; margin-top: 5px; }
+        .controles { display: flex; flex-direction: column; gap: 8px; }
+        .botoes-astro { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+        button { padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+        button:hover:not(:disabled) { transform: scale(1.03); opacity: 0.9; }
+        button.astro { background: #555; font-size: 0.9em; }
+        button.acao { background: #27ae60; font-size: 1.2em; }
+        button.reset { background: #95a5a6; }
+        input[type=range] { width: 100%; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h2>Laboratório de Gravidade: Mundos Rochosos</h2>
+
+    <canvas id="canvasPlanetas" width="800" height="400"></canvas>
+
+    <div class="painel">
+        <div class="info" id="displayDados">Selecione um astro e solte o bloco</div>
+
+        <div class="controles">
+            <label>Ângulo da Inclinação (θ): <b id="valAng">15</b>°</label>
+            <input type="range" id="inputAngulo" min="5" max="60" value="15">
+            
+            <div class="botoes-astro">
+                <button class="astro" style="border-bottom: 3px solid #95a5a6" onclick="setAstro('Mercúrio', 3.70, '#95a5a6')">Mercúrio</button>
+                <button class="astro" style="border-bottom: 3px solid #e67e22" onclick="setAstro('Vênus', 8.87, '#e67e22')">Vênus</button>
+                <button class="astro" style="border-bottom: 3px solid #3498db" onclick="setAstro('Terra', 9.81, '#3498db')">Terra</button>
+                <button class="astro" style="border-bottom: 3px solid #ecf0f1" onclick="setAstro('Lua', 1.62, '#ecf0f1')">Lua</button>
+                <button class="astro" style="border-bottom: 3px solid #c0392b" onclick="setAstro('Marte', 3.71, '#c0392b')">Marte</button>
+                <button class="astro" style="border-bottom: 3px solid #7f8c8d" onclick="setAstro('Ceres', 0.27, '#7f8c8d')">Ceres</button>
+            </div>
+        </div>
+
+        <div class="controles">
+            <button id="btnSoltar" class="acao" onclick="iniciar()">SOLTAR BLOCO</button>
+            <button id="btnReset" class="reset" onclick="resetar()">REINICIAR</button>
+            <div class="velocimetro" id="velDisplay">Velocidade: 0.00 m/s</div>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('canvasPlanetas');
+    const ctx = canvas.getContext('2d');
+
+    let g = 9.81, astroNome = "Terra", astroCor = "#3498db", angulo = 15;
+    let tempo = 0, x = 0, v = 0, animando = false;
+
+    const xInicioRampa = 100, yBaseRampa = 350, comprimentoRampaVisual = 600;
+
+    function setAstro(nome, grav, cor) {
+        g = grav; astroNome = nome; astroCor = cor;
+        resetar();
+    }
+
+    function resetar() {
+        animando = false; tempo = 0; x = 0; v = 0;
+        angulo = parseInt(document.getElementById('inputAngulo').value);
+        document.getElementById('valAng').innerText = angulo;
+        document.getElementById('btnSoltar').disabled = false;
+        desenhar();
+        atualizarInfo(0, 0);
+    }
+
+    function atualizarInfo(acc, vel) {
+        document.getElementById('displayDados').innerHTML = 
+            `Astro: ${astroNome} | Gravidade: ${g.toFixed(2)} m/s² | Aceleração no Plano: ${acc.toFixed(2)} m/s²`;
+        document.getElementById('velDisplay').innerHTML = `Velocidade: ${vel.toFixed(2)} m/s`;
+    }
+
+    function desenhar() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const rad = angulo * Math.PI / 180;
+        const hRampa = comprimentoRampaVisual * Math.sin(rad);
+        const baseRampa = comprimentoRampaVisual * Math.cos(rad);
+        const yTopoRampa = yBaseRampa - hRampa;
+        const xFimRampa = xInicioRampa + baseRampa;
+
+        ctx.fillStyle = "#2c3e50";
+        ctx.beginPath();
+        ctx.moveTo(xInicioRampa, yBaseRampa);
+        ctx.lineTo(xInicioRampa, yTopoRampa);
+        ctx.lineTo(xFimRampa, yBaseRampa);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(xInicioRampa, yTopoRampa);
+        ctx.rotate(rad);
+        ctx.fillStyle = astroCor;
+        ctx.shadowBlur = 15; ctx.shadowColor = astroCor;
+        ctx.fillRect(x, -30, 40, 30);
+        ctx.restore();
+    }
+
+    function iniciar() {
+        if(!animando) {
+            animando = true;
+            document.getElementById('btnSoltar').disabled = true;
+            loop();
+        }
+    }
+
+    function loop() {
+        if(!animando) return;
+        const rad = angulo * Math.PI / 180;
+        const aceleracao = g * Math.sin(rad);
+        tempo += 0.016; 
+        v = aceleracao * tempo;
+        x = 0.5 * aceleracao * Math.pow(tempo, 2) * 50; 
+
+        desenhar();
+        atualizarInfo(aceleracao, v);
+
+        if (x < comprimentoRampaVisual - 40) {
+            requestAnimationFrame(loop);
+        } else {
+            animando = false;
+        }
+    }
+
+    document.getElementById('inputAngulo').oninput = resetar;
+    resetar();
+</script>
+</body>
+</html>
