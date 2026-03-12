@@ -140,61 +140,6 @@
 </body>
 </html>
 
-
-
-<div id="feedback-container" style="max-width: 600px; margin: 20px auto; font-family: sans-serif; border: 1px solid #ccc; padding: 20px; border-radius: 8px;">
-    
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-        <button id="btn-like" onclick="darLike()" style="background: none; border: 2px solid #e74c3c; color: #e74c3c; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold;">
-            ❤️ <span id="like-text">Gostei</span>
-        </button>
-        <span id="like-count" style="color: #666;">(0 pessoas gostaram)</span>
-    </div>
-
-    <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
-
-    <h4>Deixe seu comentário sobre a aula:</h4>
-    <textarea id="input-comentario" placeholder="O que você achou desta simulação de física?" style="width: 100%; height: 80px; padding: 10px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 10px;"></textarea>
-    <button onclick="salvarComentario()" style="background-color: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-        Enviar Comentário
-    </button>
-
-    <div id="lista-comentarios" style="margin-top: 20px; background: #f9f9f9; padding: 10px; border-radius: 5px;">
-        </div>
-</div>
-
-<script>
-    // Lógica do Gostei
-    let likes = localStorage.getItem('likesCount') || 0;
-    document.getElementById('like-count').innerText = `(${likes} pessoas gostaram)`;
-
-    function darLike() {
-        likes++;
-        localStorage.setItem('likesCount', likes);
-        document.getElementById('like-count').innerText = `(${likes} pessoas gostaram)`;
-        document.getElementById('btn-like').style.backgroundColor = "#e74c3c";
-        document.getElementById('btn-like').style.color = "white";
-    }
-
-    // Lógica dos Comentários
-    function carregarComentarios() {
-        const comentarios = JSON.parse(localStorage.getItem('meusComentarios')) || [];
-        const lista = document.getElementById('lista-comentarios');
-        lista.innerHTML = comentarios.map(c => `<p style="border-bottom: 1px solid #eee; padding: 5px 0;">💬 ${c}</p>`).join('');
-    }
-
-    function salvarComentario() {
-        const texto = document.getElementById('input-comentario').value;
-        if(texto.trim() === "") return;
-
-        let comentarios = JSON.parse(localStorage.getItem('meusComentarios')) || [];
-        comentarios.push(texto);
-        localStorage.setItem('meusComentarios', JSON.stringify(comentarios));
-        
-        document.getElementById('input-comentario').value = "";
-        carregarComentarios();
-    }
-
     // Carrega ao iniciar
     carregarComentarios();
 </script>
