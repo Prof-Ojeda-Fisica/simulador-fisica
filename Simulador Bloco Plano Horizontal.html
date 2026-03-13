@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador de Dinâmica - Prof. Ojeda</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 850px; }
+        .controles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0; }
+        .param { display: flex; flex-direction: column; font-size: 14px; color: #555; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        button { background: #2ecc71; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; }
+        button:hover { background: #27ae60; }
+        .metrics { display: flex; justify-content: space-around; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
+        .value { font-weight: bold; color: #2c3e50; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>📦 Dinâmica: Força Aplicada vs Atrito</h2>
+    
+    <div class="controles">
+        <div class="param">
+            Massa (kg): <input type="range" id="m" min="1" max="50" value="10">
+            <span class="value" id="valM">10</span>
+        </div>
+        <div class="param">
+            Força F (N): <input type="range" id="f" min="0" max="500" value="150">
+            <span class="value" id="valF">150</span>
+        </div>
+        <div class="param">
+            Atrito (µ): <input type="range" id="u" min="0" max="1" step="0.05" value="0.2">
+            <span class="value" id="valU">0.2</span>
+        </div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <div class="metrics">
+        <div>Aceleração: <span id="resA" class="value">0.00</span> m/s²</div>
+        <div>Velocidade: <span id="resV" class="value">0.0</span> m/s</div>
+        <div>Fat Max: <span id="resFat" class="value">0.0</span> N</div>
+    </div>
+    
+    <br>
+    <button onclick="disparar()">🚀 DISPARAR BLOCO</button>
+</div>
+
+<script>
+let x = 100, v = 0, a = 0, movendo = false;
+const g = 9.81;
+
+function setup() {
+    let cnv = createCanvas(800, 200);
+    cnv.parent('canvas-container');
+}
+
+function draw() {
+    background(255);
+    
+    // 1. Captura de Inputs
+    let massa = float(document.getElementById('m').value);
+    let forca = float(document.getElementById('f').value);
+    let mu = float(document.getElementById('u').value);
+    
+    // 2. Atualiza Labels
+    document.getElementById('valM').innerText = massa;
+    document.getElementById('valF').innerText = forca;
+    document.getElementById('valU').innerText = mu;
+
+    // 3. Física (Leis de Newton)
+    let fatMax = mu * massa * g;
+    let forcaRes = forca - fatMax;
+    
+    if (forca > fatMax) {
+        a = forcaRes / massa;
+    } else {
+        a = 0;
+        if (!movendo) v = 0; // Se parou e F < Fat, não move
+    }
+
+    if (movendo) {
+        v += a * (1/60); // 60 quadros por segundo
+        x += v * 2; // Escala visual
+        if (x > width + 50) x = -50; // Loop na tela
+    }
+
+    // 4. Desenho Técnico
+    stroke(0); strokeWeight(3);
+    line(0, 160, width, 160); // Solo
+
+    // Bloco
+    fill(52, 152, 219); stroke(41, 128, 185);
+    rect(x, 110, 50, 50, 5);
+    
+    // Vetores (Setas)
+    // Seta da Força F (Azul)
+    if (forca > 0) {
+        drawArrow(x + 50, 135, forca/2, 0, 'blue');
+        fill(0, 0, 255); noStroke(); text("F", x + 60 + forca/2, 130);
+    }
+    
+    // Seta do Atrito (Vermelha)
+    if (mu > 0 && movendo) {
+        drawArrow(x, 155, -fatMax/2, 0, 'red');
+        fill(255, 0, 0); noStroke(); text("Fat", x - 40 - fatMax/2, 150);
+    }
+
+    // 5. Atualiza Métricas na tela
+    document.getElementById('resA').innerText = a.toFixed(2);
+    document.getElementById('resV').innerText = (v).toFixed(1);
+    document.getElementById('resFat').innerText = fatMax.toFixed(1);
+}
+
+function drawArrow(x, y, dx, dy, col) {
+    stroke(col); fill(col);
+    line(x, y, x + dx, y + dy);
+    let angle = atan2(dy, dx);
+    push();
+    translate(x + dx, y + dy);
+    rotate(angle);
+    triangle(0, 0, -10, -5, -10, 5);
+    pop();
+}
+
+function disparar() {
+    x = 100; v = 0; movendo = true;
+}
+</script>
+</body>
+</html>

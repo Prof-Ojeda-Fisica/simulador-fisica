@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Dinâmica - Prof. Ojeda</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        .header-box {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        .description { font-size: 1.1em; line-height: 1.6; color: #555; }
+        .canvas-container { margin-top: 20px; }
+        canvas { background: #fff; border: 2px solid #34495e; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="header-box">
+        <h1>Simulador de Dinâmica: Plano Inclinado</h1>
+        <div class="description">
+            Este simulador permite estudar o movimento de um objeto que desce um plano inclinado com ângulo ajustável, 
+            calculando a <strong>velocidade instantânea</strong> em diferentes cenários gravitacionais (Terra, Marte, Vênus, Mercúrio, Lua e Ceres).
+            <br><br>
+            <strong>Objetivo:</strong> Demonstrar como a aceleração da gravidade de diferentes corpos celestes influencia a aceleração resultante e a velocidade final.
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="simulador" width="600" height="400"></canvas>
+    </div>
+
+    <script>
+        // O código do seu simulador (JavaScript) deve ser colado aqui
+        // Se o senhor já tem as funções de desenho, gravidade e cálculo,
+        // basta mantê-las dentro desta tag <script>.
+        console.log("Simulador pronto e carregado!");
+    </script>
+
+</body>
+</html>

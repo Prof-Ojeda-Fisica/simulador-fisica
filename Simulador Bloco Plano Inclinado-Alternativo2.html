@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Laboratório de Física: Plano Inclinado</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f0f0f0; }
+        canvas { background: white; border: 2px solid #333; margin-top: 20px; box-shadow: 5px 5px 15px rgba(0,0,0,0.1); }
+        .controles { background: #ddd; padding: 20px; border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 800px; margin-top: 10px; }
+        .info { grid-column: span 2; text-align: center; font-weight: bold; font-size: 1.2em; color: #2c3e50; }
+        button { padding: 10px; cursor: pointer; border: none; border-radius: 4px; background: #3498db; color: white; font-weight: bold; }
+        button:hover { background: #2980b9; }
+        .astro-btn { background: #e67e22; }
+    </style>
+</head>
+<body>
+
+    <h2>Simulador de Plano Inclinado - Enterprise-NX01</h2>
+
+    <canvas id="canvasFisica" width="800" height="400"></canvas>
+
+    <div class="controles">
+        <div class="info" id="displayDados">
+            Ângulo: 30° | Gravidade: 9.81 m/s² (Terra)
+        </div>
+
+        <label>Ajustar Ângulo (θ):
+            <input type="range" id="inputAngulo" min="5" max="60" value="30">
+        </label>
+
+        <div style="display:flex; gap:5px;">
+            <button class="astro-btn" onclick="setGrav(9.81, 'Terra')">Terra</button>
+            <button class="astro-btn" onclick="setGrav(1.62, 'Lua')">Lua</button>
+            <button class="astro-btn" onclick="setGrav(3.71, 'Marte')">Marte</button>
+        </div>
+
+        <button onclick="iniciar()">Iniciar Simulação</button>
+        <button onclick="resetar()" style="background:#95a5a6">Resetar</button>
+    </div>
+
+<script>
+    const canvas = document.getElementById('canvasFisica');
+    const ctx = canvas.getContext('2d');
+
+    // Variáveis Físicas
+    let g = 9.81;
+    let astro = "Terra";
+    let angulo = 30;
+    let tempo = 0;
+    let animando = false;
+    let xBloco = 0; // Posição ao longo da rampa
+
+    function setGrav(valor, nome) {
+        g = valor;
+        astro = nome;
+        resetar();
+    }
+
+    function resetar() {
+        animando = false;
+        tempo = 0;
+        xBloco = 0;
+        angulo = document.getElementById('inputAngulo').value;
+        desenhar();
+        atualizarPainel(0, 0);
+    }
+
+    function atualizarPainel(acc, v) {
+        document.getElementById('displayDados').innerHTML =
+            `Ângulo: ${angulo}° | Gravidade: ${g} m/s² (${astro})<br>
+             Aceleração: ${acc.toFixed(2)} m/s² | Vel: ${v.toFixed(2)} m/s`;
+    }
+
+    function desenhar() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        let rad = angulo * Math.PI / 180;
+        let base = 700;
+        let h = base * Math.tan(rad);
+
+        // Desenha o Chão
+        ctx.beginPath();
+        ctx.moveTo(50, 350);
+        ctx.lineTo(750, 350);
+        ctx.stroke();
+
+        // Desenha a Rampa
+        ctx.fillStyle = "#bdc3c7";
+        ctx.beginPath();
+        ctx.moveTo(50, 350);
+        ctx.lineTo(50, 350 - h);
+        ctx.lineTo(50 + base, 350);
+        ctx.fill();
+
+        // Desenha o Bloco
+        ctx.save();
+        ctx.translate(50, 350 - h);
+        ctx.rotate(rad);
+
+        // Posição do bloco na rampa (xBloco)
+        ctx.fillStyle = "#e74c3c";
+        ctx.fillRect(xBloco, -30, 40, 30); // Bloco de 40x30px
+        ctx.restore();
+    }
+
+    function iniciar() {
+        if(!animando) {
+            animando = true;
+            loop();
+        }
+    }
+
+    function loop() {
+        if(!animando) return;
+
+        let rad = angulo * Math.PI / 180;
+        // Fórmula: a = g * sen(θ)
+        let aceleracao = g * Math.sin(rad);
+
+        tempo += 0.016; // Aprox 60fps
+        // Fórmula da posição: s = s0 + v0*t + (a*t²)/2
+        xBloco = (aceleracao * Math.pow(tempo, 2)) / 2 * 50; // *50 para escala visual
+
+        let velocidade = aceleracao * tempo;
+        atualizarPainel(aceleracao, velocidade);
+
+        desenhar();
+
+        // Para a simulação se chegar ao fim da rampa
+        if (xBloco < 650) {
+            requestAnimationFrame(loop);
+        } else {
+            animando = false;
+        }
+    }
+
+    // Evento de mudar o slider
+    document.getElementById('inputAngulo').oninput = resetar;
+
+    // Desenho inicial
+    resetar();
+
+</script>
+</body>
+</html>
