@@ -2,110 +2,135 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Física - Prof. Ojeda</title>
+    <title>Laboratório de Gravidade - V3</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #2c3e50; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        canvas { background-color: #ecf0f1; border: 3px solid #34495e; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); margin-bottom: 20px; }
-        .controles { background: #34495e; padding: 20px; border-radius: 10px; width: 100%; max-width: 800px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .card-feedback { background: #1e2124; padding: 20px; border-radius: 10px; width: 100%; max-width: 800px; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        input, textarea { width: 95%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: none; font-size: 14px; }
-        .btn-enviar { background: #2ecc71; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-joinha { background: #3498db; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 10px; }
-        .btn-enviar:hover { background: #27ae60; }
-        #listaComentarios { margin-top: 20px; max-height: 200px; overflow-y: auto; background: #2f3136; padding: 10px; border-radius: 5px; }
-        .comentario-item { border-bottom: 1px dashed #555; padding: 10px 0; font-size: 0.9em; }
-        .user-name { color: #f1c40f; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; background: #1a1a2e; color: #fff; margin: 0; padding: 20px; }
+        canvas { background: #000; border: 2px solid #444; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .painel { background: #16213e; padding: 20px; border-radius: 10px; width: 760px; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border: 1px solid #0f3460; }
+        .info { grid-column: span 2; background: #0f3460; padding: 12px; border-radius: 5px; text-align: center; font-size: 1.1em; border-left: 5px solid #e94560; font-family: monospace; }
+        .velocimetro { color: #f1c40f; font-weight: bold; font-size: 1.2em; margin-top: 5px; }
+        .controles { display: flex; flex-direction: column; gap: 8px; }
+        .botoes-astro { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+        button { padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+        button:hover:not(:disabled) { transform: scale(1.03); opacity: 0.9; }
+        button.astro { background: #555; font-size: 0.9em; }
+        button.acao { background: #27ae60; font-size: 1.2em; }
+        button.reset { background: #95a5a6; }
+        input[type=range] { width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <h1>Simulador de Lançamento de Projéteis</h1>
-    
-    <canvas id="simulador" width="800" height="400"></canvas>
+    <h2>Laboratório de Gravidade: Mundos Rochosos</h2>
 
-    <div class="card-feedback">
-        <h3>🚀 Laboratório de Feedback</h3>
-        <p>Gostou da simulação? Deixe seu comentário e um joinha para o projeto!</p>
-        
-        <input type="text" id="nomeAluno" placeholder="Seu nome ou matrícula">
-        <textarea id="comentarioCorpo" placeholder="O que você observou no experimento?"></textarea>
-        
-        <div style="display: flex; align-items: center;">
-            <button class="btn-enviar" onclick="enviarComentario()">Enviar Comentário</button>
-            <button class="btn-joinha" onclick="darJoinha()">👍 Curtir (<span id="totalLikes">0</span>)</button>
+    <canvas id="canvasPlanetas" width="800" height="400"></canvas>
+
+    <div class="painel">
+        <div class="info" id="displayDados">Selecione um astro e solte o bloco</div>
+
+        <div class="controles">
+            <label>Ângulo da Inclinação (θ): <b id="valAng">15</b>°</label>
+            <input type="range" id="inputAngulo" min="5" max="60" value="15">
+            
+            <div class="botoes-astro">
+                <button class="astro" style="border-bottom: 3px solid #95a5a6" onclick="setAstro('Mercúrio', 3.70, '#95a5a6')">Mercúrio</button>
+                <button class="astro" style="border-bottom: 3px solid #e67e22" onclick="setAstro('Vênus', 8.87, '#e67e22')">Vênus</button>
+                <button class="astro" style="border-bottom: 3px solid #3498db" onclick="setAstro('Terra', 9.81, '#3498db')">Terra</button>
+                <button class="astro" style="border-bottom: 3px solid #ecf0f1" onclick="setAstro('Lua', 1.62, '#ecf0f1')">Lua</button>
+                <button class="astro" style="border-bottom: 3px solid #c0392b" onclick="setAstro('Marte', 3.71, '#c0392b')">Marte</button>
+                <button class="astro" style="border-bottom: 3px solid #7f8c8d" onclick="setAstro('Ceres', 0.27, '#7f8c8d')">Ceres</button>
+            </div>
         </div>
 
-        <div id="listaComentarios">
-            </div>
+        <div class="controles">
+            <button id="btnSoltar" class="acao" onclick="iniciar()">SOLTAR BLOCO</button>
+            <button id="btnReset" class="reset" onclick="resetar()">REINICIAR</button>
+            <div class="velocimetro" id="velDisplay">Velocidade: 0.00 m/s</div>
+        </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script>
+    const canvas = document.getElementById('canvasPlanetas');
+    const ctx = canvas.getContext('2d');
 
-    <script>
-        // Sua configuração oficial
-        const firebaseConfig = {
-            apiKey: "AIzaSyCkViWCVPEffgSUm3yrUxVQb4l-L_5N9bY",
-            authDomain: "simuladores-ojeda.firebaseapp.com",
-            databaseURL: "https://simuladores-ojeda-default-rtdb.firebaseio.com",
-            projectId: "simuladores-ojeda",
-            storageBucket: "simuladores-ojeda.firebasestorage.app",
-            messagingSenderId: "132201290809",
-            appId: "1:132201290809:web:f115ec17d1d7ebac6e01e8"
-        };
+    let g = 9.81, astroNome = "Terra", astroCor = "#3498db", angulo = 15;
+    let tempo = 0, x = 0, v = 0, animando = false;
 
-        // Inicializando o Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+    const xInicioRampa = 100, yBaseRampa = 350, comprimentoRampaVisual = 600;
 
-        // Lógica do Simulador (Exemplo simplificado para não bugar)
-        const canvas = document.getElementById('simulador');
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = "#3498db";
-        ctx.arc(50, 350, 10, 0, Math.PI*2);
+    function setAstro(nome, grav, cor) {
+        g = grav; astroNome = nome; astroCor = cor;
+        resetar();
+    }
+
+    function resetar() {
+        animando = false; tempo = 0; x = 0; v = 0;
+        angulo = parseInt(document.getElementById('inputAngulo').value);
+        document.getElementById('valAng').innerText = angulo;
+        document.getElementById('btnSoltar').disabled = false;
+        desenhar();
+        atualizarInfo(0, 0);
+    }
+
+    function atualizarInfo(acc, vel) {
+        document.getElementById('displayDados').innerHTML = 
+            `Astro: ${astroNome} | Gravidade: ${g.toFixed(2)} m/s² | Aceleração no Plano: ${acc.toFixed(2)} m/s²`;
+        document.getElementById('velDisplay').innerHTML = `Velocidade: ${vel.toFixed(2)} m/s`;
+    }
+
+    function desenhar() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const rad = angulo * Math.PI / 180;
+        const hRampa = comprimentoRampaVisual * Math.sin(rad);
+        const baseRampa = comprimentoRampaVisual * Math.cos(rad);
+        const yTopoRampa = yBaseRampa - hRampa;
+        const xFimRampa = xInicioRampa + baseRampa;
+
+        ctx.fillStyle = "#2c3e50";
+        ctx.beginPath();
+        ctx.moveTo(xInicioRampa, yBaseRampa);
+        ctx.lineTo(xInicioRampa, yTopoRampa);
+        ctx.lineTo(xFimRampa, yBaseRampa);
+        ctx.closePath();
         ctx.fill();
-        ctx.fillStyle = "#333";
-        ctx.fillText("Pronto para o disparo, Professor!", 60, 355);
 
-        // FUNÇÕES DO FIREBASE
-        function enviarComentario() {
-            const nome = document.getElementById('nomeAluno').value;
-            const msg = document.getElementById('comentarioCorpo').value;
-            
-            if(nome && msg) {
-                db.ref('comentarios').push({
-                    usuario: nome,
-                    mensagem: msg,
-                    data: new Date().toLocaleString()
-                });
-                document.getElementById('comentarioCorpo').value = "";
-                alert("Comentário registrado no banco de dados!");
-            } else {
-                alert("Por favor, preencha o nome e o comentário.");
-            }
+        ctx.save();
+        ctx.translate(xInicioRampa, yTopoRampa);
+        ctx.rotate(rad);
+        ctx.fillStyle = astroCor;
+        ctx.shadowBlur = 15; ctx.shadowColor = astroCor;
+        ctx.fillRect(x, -30, 40, 30);
+        ctx.restore();
+    }
+
+    function iniciar() {
+        if(!animando) {
+            animando = true;
+            document.getElementById('btnSoltar').disabled = true;
+            loop();
         }
+    }
 
-        function darJoinha() {
-            db.ref('likes').transaction(atual => (atual || 0) + 1);
+    function loop() {
+        if(!animando) return;
+        const rad = angulo * Math.PI / 180;
+        const aceleracao = g * Math.sin(rad);
+        tempo += 0.016; 
+        v = aceleracao * tempo;
+        x = 0.5 * aceleracao * Math.pow(tempo, 2) * 50; 
+
+        desenhar();
+        atualizarInfo(aceleracao, v);
+
+        if (x < comprimentoRampaVisual - 40) {
+            requestAnimationFrame(loop);
+        } else {
+            animando = false;
         }
+    }
 
-        // Escutar atualizações de Likes
-        db.ref('likes').on('value', (snap) => {
-            document.getElementById('totalLikes').innerText = snap.val() || 0;
-        });
-
-        // Escutar e listar novos comentários
-        db.ref('comentarios').on('value', (snap) => {
-            const lista = document.getElementById('listaComentarios');
-            lista.innerHTML = "";
-            snap.forEach((item) => {
-                const dado = item.val();
-                lista.innerHTML = `<div class="comentario-item">
-                    <span class="user-name">${dado.usuario}:</span> ${dado.mensagem}
-                </div>` + lista.innerHTML;
-            });
-        });
-    </script>
+    document.getElementById('inputAngulo').oninput = resetar;
+    resetar();
+</script>
 </body>
 </html>
