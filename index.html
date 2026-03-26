@@ -2,35 +2,6 @@
 <html lang="pt-br">
    
 <head>
-
-
-function gerarRelatorio() {
-    // Mantém as variáveis que você já criou (Astro, Grav, etc)
-    const astro = document.querySelector('.btn-active')?.innerText || "Terra"; // Ajustado para pegar o botão ativo
-    const grav = document.getElementById('v_grav')?.innerText || "9.81";
-    const angulo = document.getElementById('v_ang')?.innerText || "15";
-    const velFinal = document.getElementById('v_vel')?.innerText || "0.00";
-
-    const texto = `--- RELATÓRIO DE FÍSICA: PROF. OJEDA ---\n` +
-                  `Astro: ${astro}\n` +
-                  `Gravidade Local: ${grav} m/s²\n` +
-                  `Ângulo: ${angulo}°\n` +
-                  `Velocidade de Chegada: ${velFinal} m/s\n` +
-                  `----------------------------------------`;
-
-    // Cria o arquivo para download
-    const blob = new Blob([texto], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `Experimento_${astro}_Ojeda.txt`;
-    link.click();
-}
-
-
-
-
-
-
    
     <meta charset="UTF-8">
     <title>Laboratório de Gravidade - V3</title>
@@ -96,7 +67,6 @@ function gerarRelatorio() {
     }
 
     function resetar() {
-       <button onclick="gerarRelatorio()" style="background: #f39c12; margin-top: 10px;">GERAR RELATÓRIO</button>
         animando = false; tempo = 0; x = 0; v = 0;
         angulo = parseInt(document.getElementById('inputAngulo').value);
         document.getElementById('valAng').innerText = angulo;
