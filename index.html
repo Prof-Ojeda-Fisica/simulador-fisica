@@ -2,6 +2,41 @@
 <html lang="pt-br">
    
 <head>
+
+
+function gerarRelatorio() {
+    // Captura os dados atuais da tela
+    const astro = document.querySelector('strong')?.innerText || "Não selecionado";
+    const grav = document.getElementById('v_grav')?.innerText || "0";
+    const angulo = document.getElementById('v_ang')?.innerText || "0";
+    const velFinal = document.getElementById('v_vel')?.innerText || "0";
+
+    const relatorio = `
+        --- RELATÓRIO DE EXPERIMENTO: MUNDOS ROCHOSOS ---
+        Professor: João Henrique Ojeda
+        
+        Astro Selecionado: ${astro}
+        Gravidade local: ${grav} m/s²
+        Ângulo de Inclinação: ${angulo}°
+        Velocidade Final Atingida: ${velFinal} m/s
+        ------------------------------------------------
+    `;
+
+    // Abre uma janelinha de alerta com o resumo (ou você pode imprimir no console)
+    alert(relatorio);
+    
+    // Opcional: Copia para a área de transferência automaticamente
+    navigator.clipboard.writeText(relatorio);
+    console.log("Relatório copiado para a área de transferência!");
+}
+
+
+
+
+
+
+
+   
     <meta charset="UTF-8">
     <title>Laboratório de Gravidade - V3</title>
     <style>
