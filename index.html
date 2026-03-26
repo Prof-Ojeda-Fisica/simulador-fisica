@@ -5,31 +5,26 @@
 
 
 function gerarRelatorio() {
-    // Captura os dados atuais da tela
-    const astro = document.querySelector('strong')?.innerText || "Não selecionado";
-    const grav = document.getElementById('v_grav')?.innerText || "0";
-    const angulo = document.getElementById('v_ang')?.innerText || "0";
-    const velFinal = document.getElementById('v_vel')?.innerText || "0";
+    // Mantém as variáveis que você já criou (Astro, Grav, etc)
+    const astro = document.querySelector('.btn-active')?.innerText || "Terra"; // Ajustado para pegar o botão ativo
+    const grav = document.getElementById('v_grav')?.innerText || "9.81";
+    const angulo = document.getElementById('v_ang')?.innerText || "15";
+    const velFinal = document.getElementById('v_vel')?.innerText || "0.00";
 
-    const relatorio = `
-        --- RELATÓRIO DE EXPERIMENTO: MUNDOS ROCHOSOS ---
-        Professor: João Henrique Ojeda
-        
-        Astro Selecionado: ${astro}
-        Gravidade local: ${grav} m/s²
-        Ângulo de Inclinação: ${angulo}°
-        Velocidade Final Atingida: ${velFinal} m/s
-        ------------------------------------------------
-    `;
+    const texto = `--- RELATÓRIO DE FÍSICA: PROF. OJEDA ---\n` +
+                  `Astro: ${astro}\n` +
+                  `Gravidade Local: ${grav} m/s²\n` +
+                  `Ângulo: ${angulo}°\n` +
+                  `Velocidade de Chegada: ${velFinal} m/s\n` +
+                  `----------------------------------------`;
 
-    // Abre uma janelinha de alerta com o resumo (ou você pode imprimir no console)
-    alert(relatorio);
-    
-    // Opcional: Copia para a área de transferência automaticamente
-    navigator.clipboard.writeText(relatorio);
-    console.log("Relatório copiado para a área de transferência!");
+    // Cria o arquivo para download
+    const blob = new Blob([texto], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Experimento_${astro}_Ojeda.txt`;
+    link.click();
 }
-
 
 
 
